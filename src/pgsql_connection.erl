@@ -606,9 +606,9 @@ pgsql_setup_authenticate_md5_password(Socket, Salt, #state{options = Options} = 
     User = proplists:get_value(user, Options, ?DEFAULT_USER),
     Password = proplists:get_value(password, Options, ?DEFAULT_PASSWORD),
     % concat('md5', md5(concat(md5(concat(password, username)), random-salt)))
-    <<MD51Int:128>> = crypto:md5([Password, User]),
+    <<MD51Int:128>> = crypto:hash(md5, [Password, User]),
     MD51Hex = io_lib:format("~32.16.0b", [MD51Int]),
-    <<MD52Int:128>> = crypto:md5([MD51Hex, Salt]),
+    <<MD52Int:128>> = crypto:hash(md5, [MD51Hex, Salt]),
     MD52Hex = io_lib:format("~32.16.0b", [MD52Int]),
     MD5ChallengeResponse = ["md5", MD52Hex],
     pgsql_setup_authenticate_password(Socket, MD5ChallengeResponse, State0).
