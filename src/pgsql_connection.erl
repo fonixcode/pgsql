@@ -1108,7 +1108,11 @@ update_oid_map(#state{} = State0) ->
 -spec set_passive_or_reconnect_if_required(#state{}) -> #state{}.
 set_passive_or_reconnect_if_required(#state{socket = closed, options = Options} = State0) ->
     case proplists:get_value(reconnect, Options, true) of
-        true -> pgsql_open(State0);
+        true ->
+            case pgsql_open(State0) of
+                {ok, State1} -> State1;
+                {error, _Reason} -> State0
+            end;
         false -> State0
     end;
 set_passive_or_reconnect_if_required(#state{socket = {gen_tcp, Socket}} = State0) ->
